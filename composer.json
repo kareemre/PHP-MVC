@@ -1,0 +1,17 @@
+{
+    "name": "kareem-refaat/authphp",
+    "description": "Login and register system using native php",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Matariya\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "kareem Re",
+            "email": "lekareem21@outlook.com"
+        }
+    ],
+    "require": {}
+}
