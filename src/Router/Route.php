@@ -75,7 +75,7 @@ class Route
     }
     
     /**
-     * handleRoute
+     * execute routes actions
      *
      * @return void
      */
