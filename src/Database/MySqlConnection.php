@@ -3,7 +3,7 @@ namespace Matariya\Database;
 use PDO;
 use PDOException;
 
-class connection
+class MySqlConnection
 { 
      /**
      * PDO connection 
@@ -21,7 +21,7 @@ class connection
 
     
     /**
-     * determine and ensuring it's a single connection
+     * determining and ensuring it's a single connection
      *
      * @return bool
      */
@@ -39,10 +39,14 @@ class connection
     {
         try {
             static::$connection = new PDO('mysql:host=localhost;dbname=auth', 'root', '');
+            
+            static::$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
+            static::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         } catch (PDOException $e) {
             die($e->getMessage());
         }
-        
     }
     
     /**
