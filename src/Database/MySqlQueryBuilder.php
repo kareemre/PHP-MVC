@@ -23,6 +23,15 @@ class MySqlQueryBuilder
      *
      * @var array
      */
+
+    
+    /**
+     * Total Rows
+     *
+     * @var int
+     */
+    private $rows = 0;
+
     private $data = [];
     
     /**
@@ -32,7 +41,21 @@ class MySqlQueryBuilder
      */
     private $wheres = [];
 
-        /**
+    /**
+     * container used for select statements
+     *
+     * @var array
+     */
+    private $selects = [];
+
+    /**
+     * container used for join statements
+     *
+     * @var array
+     */
+    private $joins = [];
+
+    /**
      * user's bindings container   
      *
      * @var array
@@ -41,12 +64,12 @@ class MySqlQueryBuilder
     
     
     public function __construct(MySqlConnection $connection)
-     {
+    {
         $this->connection = $connection;
-     }
+    }
 
 
-        /**
+    /**
      * set the table name
      *
      * @param  string $table
@@ -68,7 +91,113 @@ class MySqlQueryBuilder
      */
     public function from($table)
     {
-       return $this->table($table);
+        return $this->table($table);
+    }
+    
+    /**
+     * set select clause
+     *
+     * @param  mixed $selects
+     * @return object
+     */
+    public function select(...$selects)
+    {
+        $this->selects = array_merge($this->selects, $selects);
+
+        return $this;
+    }
+
+    /**
+     * Set Join clause
+     *
+     * @param string $join
+     * @return $this
+     */
+    public function join($join)
+    {
+        $this->joins[] = $join;
+
+        return $this;
+    }
+    
+    /**
+     * get only  one record
+     *
+     * @param  string $table
+     * @return \stdclass
+     */
+    public function get($table = null)
+    {
+        if ($table) {
+            $this->table($table);
+        }
+
+        $sql = $this->fetchStatement();
+
+        $result = $this->queryExcute($sql, $this->bindings)->fetch();
+
+        $this->reset();
+
+        return $result;
+    }
+
+    /**
+     * get All Records from Table
+     *
+     * @param string $table
+     * @return array
+     */
+    public function getAll($table = null)
+    {
+        if ($table) {
+            $this->table($table);
+        }
+
+        $sql = $this->fetchStatement();
+
+        $query = $this->queryExcute($sql, $this->bindings);
+
+        $results = $query->fetchAll();
+
+        $this->rows = $query->rowCount();
+
+        $this->reset();
+
+        return $results;
+    }
+
+    /**
+     * Get total rows from last fetch all statement
+     *
+     * @return int
+     */
+    public function rows()
+    {
+        return $this->rows;
+    }
+
+    /**
+     * Prepare Select Statement
+     *
+     * @return string
+     */
+    private function fetchStatement()
+    {
+        $sql = 'SELECT ';
+
+        if ($this->selects) {
+            $sql .= implode(',', $this->selects);
+        } else {
+            $sql .= '*';
+        }
+
+        $sql .= ' FROM ' . $this->table . ' ';
+
+        if ($this->wheres) {
+            $sql .= ' WHERE ' . implode(' ', $this->wheres);
+        }
+
+        return $sql;
     }
 
         
@@ -149,30 +278,29 @@ class MySqlQueryBuilder
         $sqlQuery .= $this->setFields();
         
         if ($this->wheres) {
-            $sqlQuery .= ' WHERE ' . implode(' ' , $this->wheres);
+            $sqlQuery .= ' WHERE ' . implode(' and ' , $this->wheres);
         }
-
         $this->queryExcute($sqlQuery, $this->bindings);
         return $this;
     }
 
     /**
-     * Set the fields for insert and update
+     * Set the query for insert and update
      *
      * @return string
      */
-      private function setFields()
-      {
-          $sql = '';
- 
-          foreach (array_keys($this->data) as $key) {
-              $sql .= '`' . $key . '` = ? , ';
-          }
- 
-          $sql = rtrim($sql, ', ');
- 
-          return $sql;
-      }
+    private function setFields()
+    {
+        $sql = '';
+
+        foreach (array_keys($this->data) as $key) {
+            $sql .= '`' . $key . '` = ? , ';
+        }
+
+        $sql = rtrim($sql, ', ');
+
+        return $sql;
+    }
 
 
     /**
@@ -201,28 +329,43 @@ class MySqlQueryBuilder
     {
         $sqlQuery = array_shift($params);
 
-         if (count($params) == 1 AND is_array($params[0])) {
-             $params = $params[0];
-         }
+        if (count($params) == 1 AND is_array($params[0])) {
+            $params = $params[0];
+        }
 
-         try {
-             $query = $this->connection->getConnection()->prepare($sqlQuery);
+        try {
+            $query = $this->connection->getConnection()->prepare($sqlQuery);
 
-             foreach ($params as $key => $value) {
-                 $query->bindValue($key + 1, htmlspecialchars($value));
-             }
+            foreach ($params as $key => $value) {
+                $query->bindValue($key + 1, htmlspecialchars($value));
+            }
 
-             $query->execute();
+            $query->execute();
 
-             return $query;
+            return $query;
 
-         } catch (\PDOException $e) {
+        } catch (\PDOException $e) {
             
-             echo $sqlQuery;
-             echo '<pre>';
-             print_r($this->bindings);
-             echo '</pre>';
-             die($e->getMessage());
-         }
+            echo $sqlQuery;
+            echo '<pre>';
+            print_r($this->bindings);
+            echo '</pre>';
+            die($e->getMessage());
+        }
+    }
+
+    /**
+     * Reset All Data
+     *
+     * @return void
+     */
+    private function reset()
+    {
+        $this->table = null;
+        $this->data = [];
+        $this->joins = [];
+        $this->wheres = [];
+        $this->selects = [];
+        $this->bindings = [];
     }
 }

@@ -14,5 +14,10 @@ $route = new Route(new Request);
 $connect = new MySqlConnection();
 $db = new MySqlQueryBuilder($connect);
 
+$root = dirname(__DIR__);
+
+// $db->data('email', 'kareem@gmail.com')
+//     ->where('id = ? ', 2)
+//     ->where('password = ?', 3252)->update('users');
 
 
