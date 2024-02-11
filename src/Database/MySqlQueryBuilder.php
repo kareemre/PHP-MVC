@@ -1,10 +1,10 @@
-<?php 
+<?php
 
 namespace Matariya\Database;
 
 class MySqlQueryBuilder
-{    
-    
+{
+
     /**
      * connection instance 
      *
@@ -17,14 +17,14 @@ class MySqlQueryBuilder
      * @var string
      */
     private $table;
-    
+
     /**
      * user's data that will be handled through the application    
      *
      * @var array
      */
 
-    
+
     /**
      * Total Rows
      *
@@ -32,8 +32,13 @@ class MySqlQueryBuilder
      */
     private $rows = 0;
 
+    /**
+     * user's data container
+     *
+     * @var array
+     */
     private $data = [];
-    
+
     /**
      * container used for where statements
      *
@@ -61,8 +66,8 @@ class MySqlQueryBuilder
      * @var array
      */
     private $bindings = [];
-    
-    
+
+
     public function __construct(MySqlConnection $connection)
     {
         $this->connection = $connection;
@@ -82,7 +87,7 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    
+
     /**
      * from statement
      *
@@ -93,7 +98,7 @@ class MySqlQueryBuilder
     {
         return $this->table($table);
     }
-    
+
     /**
      * set select clause
      *
@@ -119,7 +124,7 @@ class MySqlQueryBuilder
 
         return $this;
     }
-    
+
     /**
      * get only  one record
      *
@@ -200,7 +205,7 @@ class MySqlQueryBuilder
         return $sql;
     }
 
-        
+
     /**
      * sql WHERE clause
      *
@@ -218,7 +223,7 @@ class MySqlQueryBuilder
         return $this;
     }
 
-    
+
     /**
      * merge user data if array to data container
      *
@@ -248,20 +253,20 @@ class MySqlQueryBuilder
      * @param array $data
      * @return object
      */
-    public  function insert($table = null)
+    public function insert($table = null)
     {
         if ($table) {
             $this->table($table);
-        } 
+        }
         $sqlQuery = "INSERT INTO " . $this->table . " SET ";
 
         $sqlQuery = $this->setFields();
 
         $this->queryExcute($sqlQuery, $this->bindings);
-        return $this;     
+        return $this;
     }
 
-    
+
     /**
      * update database record
      *
@@ -272,13 +277,13 @@ class MySqlQueryBuilder
     {
         if ($table) {
             $this->table($table);
-        } 
+        }
         $sqlQuery = "UPDATE " . $this->table . " SET ";
 
         $sqlQuery .= $this->setFields();
-        
+
         if ($this->wheres) {
-            $sqlQuery .= ' WHERE ' . implode(' and ' , $this->wheres);
+            $sqlQuery .= ' WHERE ' . implode(' and ', $this->wheres);
         }
         $this->queryExcute($sqlQuery, $this->bindings);
         return $this;
@@ -318,7 +323,7 @@ class MySqlQueryBuilder
         }
     }
 
-    
+
     /**
      * executing a sql query
      *
@@ -329,7 +334,7 @@ class MySqlQueryBuilder
     {
         $sqlQuery = array_shift($params);
 
-        if (count($params) == 1 AND is_array($params[0])) {
+        if (count($params) == 1 and is_array($params[0])) {
             $params = $params[0];
         }
 
@@ -345,7 +350,7 @@ class MySqlQueryBuilder
             return $query;
 
         } catch (\PDOException $e) {
-            
+
             echo $sqlQuery;
             echo '<pre>';
             print_r($this->bindings);

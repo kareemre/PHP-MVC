@@ -1,8 +1,8 @@
-<?php 
+<?php
 namespace Matariya\Http;
 
 class Request
-{    
+{
     /**
      * uri
      *
@@ -10,7 +10,7 @@ class Request
      */
     private $url;
 
-    
+
     /**
      * setting the url 
      *
@@ -22,9 +22,9 @@ class Request
 
         if (str_contains($requestUri, '?')) {
             list($requestUri, $queryString) = explode('?', $requestUri);
-         }
+        }
 
-         $this->url = explode('public', $requestUri)[1];
+        $this->url = explode('public', $requestUri)[1];
     }
 
     /**
@@ -48,15 +48,15 @@ class Request
         return $_SERVER[$key];
     }
 
-        /**
+    /**
      * Get value from get request
      * 
      * @param string $key
      * @return string $value 
      */
-    public static function get(string $key) 
+    public function get(string $key)
     {
-         return $_GET[$key];
+        return $_GET[$key];
     }
 
     /**
@@ -65,11 +65,11 @@ class Request
      * @param string $key
      * @return string $value 
      */
-    public static function post(string $key) 
+    public function post(string $key)
     {
-         return $_POST[$key];
+        return $_POST[$key];
     }
-    
+
     /**
      * determining the request method
      *
@@ -77,6 +77,6 @@ class Request
      */
     public static function method()
     {
-         return static::server('REQUEST_METHOD');
+        return static::server('REQUEST_METHOD');
     }
 }

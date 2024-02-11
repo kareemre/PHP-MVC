@@ -10,7 +10,7 @@ class Route
      *
      * @var array
      */
-    private $routes = [];
+    public $routes = [];
 
     private $request;
 
@@ -50,6 +50,8 @@ class Route
     public function get($url, $action)
     {
          $this->addRoute('GET', $url, $action);
+
+         return $this;
     }
     
     /**
@@ -83,41 +85,18 @@ class Route
     {
         $url = $this->request->getUrl();
 
-        foreach ($this->routes as $route) {
-            $matched = true;
+        
+        $action = $this->routes[0]['action'] ?? false;
 
-            $route['uri'] = preg_replace('/\/{(.*?)}/', '/(.*?)', $route['uri']);
-            $route['uri'] = '#^' .$route['uri'] .'$#';
-            
-            if (preg_match($route['uri'], $url, $matches)) {
-                array_shift($matches);
 
-                $params = array_values($matches);
-                foreach ($params as $param) {
-                    if (strpos($param, '/')) {
-                        $matched = false;
-                    }
-                }
-                
-                if ($route['method'] != Request::method()) {
-                    $matched = false;
-                }
-
-                if ($matched) {
-                    return $this->invoke($route, $params);
-                }
-            }
-
+        if (!$action) {
+            return;
         }
-    }
-
-
-    public function invoke($route, array $params = [])
-    {
-        $action = $route['action'];
 
         if (is_callable($action)) {
-            return call_user_func($action);
+            return call_user_func_array($action, []);
         }
+    
     }
+
 }

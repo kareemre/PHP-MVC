@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Matariya\Bootstrap;
 
@@ -6,32 +6,44 @@ use Matariya\File\File;
 
 class Application
 {
-    
-
-        
     /**
-     * __construct
+     * instance of filesystem
      *
-     * @return void
+     * @var mixed
      */
-    public function __construct()
-    {
-    
-    }
-    
+    private $file;
+
+    private $basePath;
+
     /**
-     * run an instance from the application
+     * Application Object
      *
-     * 
-     * @return void
-     */    
-    public function run()
+     * @var \src\bootstrap\Application
+     */
+    private static $instance;
+
+    public function __construct(File $file, $basePath)
     {
-        
+        $this->file = $file;
+        $this->basePath = $basePath;
     }
 
 
-
-
-    
+    /**
+     * Get All Core Classes with its aliases
+     *
+     * @return array
+     */
+    private function coreClasses()
+    {
+        return [
+            'request'       => \Matariya\Http\Request::class,
+            'route'         => \Matariya\Router\Route::class,
+            'db'            => \Matariya\Database\MySqlQueryBuilder::class,
+            'db.connection' => \Matariya\Database\MySqlConnection::class,
+            'view'          => 'System\\View\\ViewFactory',
+            'url'           => 'System\\Url',
+            'validator'     => \Matariya\Validation\Validation::class,
+        ];
+    }
 }
