@@ -4,7 +4,7 @@ namespace Matariya\View;
 
 use Matariya\File\File;
 
-class View 
+class View implements ViewInterface
 {
 
     private $file;
@@ -55,45 +55,44 @@ class View
 
         $this->viewPath = $this->file->path($relativeViewPath);
 
-        if (! $this->viewFileExists($relativeViewPath)) {
+        if (!$this->viewFileExists($relativeViewPath)) {
             die('<b>' . $viewPath . ' View</b>' . ' does not exists in Views Folder');
         }
     }
 
-    
+
     /**
-    * Determine if the view file exists
-    *
-    * @param string $viewPath
-    * @return bool
-    */
+     * Determine if the view file exists
+     *
+     * @param string $viewPath
+     * @return bool
+     */
     private function viewFileExists($viewPath)
     {
         return $this->file->exists($viewPath);
     }
 
-    
+
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
     public function getOutput()
     {
-        if (is_null($this->output)) {
-            ob_start();
+        ob_start();
 
-            extract($this->data);
+        extract($this->data);
 
-            require $this->viewPath;
+        require $this->viewPath;
 
-            $this->output = ob_get_clean();
-        }
+        $this->output = ob_get_clean();
+
 
         return $this->output;
     }
 
     /**
-    * {@inheritDoc}
-    */
+     * {@inheritDoc}
+     */
     public function __toString()
     {
         return $this->getOutput();

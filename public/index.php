@@ -1,4 +1,5 @@
 <?php
+use Matariya\Bootstrap\Application;
 use Matariya\Database\MySqlConnection;
 use Matariya\Database\MySqlQueryBuilder;
 use Matariya\File\File;
@@ -10,17 +11,26 @@ use Matariya\View\ViewFactory;
 
 $basePath = dirname(__DIR__);
 require $basePath . '/vendor/autoload.php';
-$response = new Response();
-$route = new Route(new Request);
-$connect = new MySqlConnection();
-$db = new MySqlQueryBuilder($connect);
-$file = new File($basePath);
-$viewFactory = new ViewFactory($file);
-// $route->get('go/home', function(){
-//     echo 'hello';
+
+$firstname = "Peter";
+$lastname = "Griffin";
+$age = "41";
+
+$result = compact("firstname", "lastname", "age");
+
+var_dump($result);
+// $app = new Application($basePath);
+// $route = new Route(new Request);
+// $connect = new MySqlConnection();
+// $db = new MySqlQueryBuilder($connect);
+// $viewFactory = new ViewFactory($file);
+// $request = new Request();
+
+// $route->get('register', function() use ($viewFactory){
+//     echo  $viewFactory->render('home');
 // })->handleRoute();
 
-// var_dump($route->routes[0]['action']);
+
 
 
 // echo $file->path('public/images/image.jpg');

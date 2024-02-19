@@ -9,6 +9,13 @@ class Request
      * @var string
      */
     private $url;
+    
+    /**
+     * generate baseurl like http//localhost/...
+     *
+     * @var string
+     */
+    private $baseUrl;
 
 
     /**
@@ -18,23 +25,34 @@ class Request
      */
     public function prepareUrl()
     {
+        $script = dirname(static::server('SCRIPT_NAME'));
         $requestUri = static::server('REQUEST_URI');
 
         if (str_contains($requestUri, '?')) {
             list($requestUri, $queryString) = explode('?', $requestUri);
         }
-
         $this->url = explode('public', $requestUri)[1];
+        $this->baseUrl = static::server('REQUEST_SCHEME') . '://' . $this->server('HTTP_HOST') . $script . '/';
     }
 
     /**
      * get the value of cleansed url
      *
-     * @return string
+     * return string
      */
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Get full url of the script
+     *
+     * @return string
+     */
+    public function baseUrl()
+    {
+        return $this->baseUrl;
     }
 
     /**

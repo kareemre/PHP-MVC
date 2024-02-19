@@ -19,18 +19,24 @@ class File
      * @var string
      */
     private $root;
+
+    /**
+     * Constructor
+     *
+     * @param string $root
+     */
+    public function __construct($root = null)
+    {
+        $this->root = $root;
+    }
+
+
     /**
      * Check if file exists
      *
      * @param  mixed $file
      * @return bool
      */
-
-
-    public function __construct($root)
-    {
-        $this->root = $root;
-    }
     
     public function exists($file)
     {
@@ -48,7 +54,13 @@ class File
     {
         return $this->root . static::DS . str_replace(['/', '\\'], static::DS, $path);
     }
-
+    
+    /**
+     * require a file
+     *
+     * @param  string $path
+     * @return mixed
+     */
     public function requireFile($path)
     {
         return require $this->path($path);

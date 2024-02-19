@@ -1,10 +1,11 @@
-<?php 
+<?php
 
 namespace Matariya\Router;
+
 use Matariya\Http\Request;
 
 class Route
-{    
+{
     /**
      * routes container
      *
@@ -12,14 +13,6 @@ class Route
      */
     public $routes = [];
 
-    private $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    
     /**
      * adding routes to routes container
      *
@@ -33,13 +26,13 @@ class Route
         $uri = trim($uri, '/');
 
         $this->routes[] = [
-            'uri'            => $uri,
-            'method'         => $requestMethod,
-            'action'         => $action,
+            'uri' => $uri,
+            'method' => $requestMethod,
+            'action' => $action,
         ];
     }
 
-    
+
     /**
      * adding route through get method
      *
@@ -49,11 +42,10 @@ class Route
      */
     public function get($url, $action)
     {
-         $this->addRoute('GET', $url, $action);
-
-         return $this;
+        $this->addRoute('GET', $url, $action);
+        return $this;
     }
-    
+
     /**
      * adding route through post method
      *
@@ -63,7 +55,8 @@ class Route
      */
     public function post($url, $action)
     {
-         $this->addRoute('post', $url, $action);
+        $this->addRoute('post', $url, $action);
+        return $this;
     }
 
     public function delete()
@@ -75,7 +68,7 @@ class Route
     {
         //
     }
-    
+
     /**
      * execute routes actions
      *
@@ -83,20 +76,12 @@ class Route
      */
     public function handleRoute()
     {
-        $url = $this->request->getUrl();
-
-        
-        $action = $this->routes[0]['action'] ?? false;
-
-
-        if (!$action) {
-            return;
+        if (ltrim($this->request->getUrl(), '/') == $this->routes[0]['uri']) {
+            $action = $this->routes[0]['action'] ?? false;
+            if (is_callable($action)) {
+                return call_user_func_array($action, []);
+            }
         }
-
-        if (is_callable($action)) {
-            return call_user_func_array($action, []);
-        }
-    
     }
 
 }
