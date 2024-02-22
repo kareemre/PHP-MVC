@@ -14,20 +14,16 @@ class File
     const DS = DIRECTORY_SEPARATOR;
 
     /**
-     * Root Path
+     * base Path
      *
      * @var string
      */
-    private $root;
+    private $basePath;
 
-    /**
-     * Constructor
-     *
-     * @param string $root
-     */
-    public function __construct($root = null)
+
+    public function setBasePath($basePath)
     {
-        $this->root = $root;
+        $this->basePath = $basePath;
     }
 
 
@@ -37,7 +33,7 @@ class File
      * @param  mixed $file
      * @return bool
      */
-    
+
     public function exists($file)
     {
         return file_exists($this->path($file));
@@ -52,9 +48,9 @@ class File
      */
     public function path($path)
     {
-        return $this->root . static::DS . str_replace(['/', '\\'], static::DS, $path);
+        return $this->basePath . static::DS . str_replace(['/', '\\'], static::DS, $path);
     }
-    
+
     /**
      * require a file
      *
@@ -63,6 +59,6 @@ class File
      */
     public function requireFile($path)
     {
-        return require $this->path($path);
+        return require_once $this->path($path);
     }
 }

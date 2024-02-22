@@ -1,24 +1,34 @@
 <?php
 use Matariya\Bootstrap\Application;
-use Matariya\Database\MySqlConnection;
-use Matariya\Database\MySqlQueryBuilder;
-use Matariya\File\File;
-use Matariya\Http\Request;
-use Matariya\Http\Response;
-use Matariya\Router\Route;
-use Matariya\View\ViewFactory;
-
 
 $basePath = dirname(__DIR__);
 require $basePath . '/vendor/autoload.php';
+$app = Application::getInstance($basePath);
+$app->run();
+// var_dump($app->route->routes);
+// $route = $app->route->getArgumentsFrom();
+        // echo '<pre>';
+        // print_r($route);
+        // echo '</pre>';
 
-$firstname = "Peter";
-$lastname = "Griffin";
-$age = "41";
+// list($controller, $method) = [Application::class, 'index'];
 
-$result = compact("firstname", "lastname", "age");
+// echo $controller;
 
-var_dump($result);
+
+// var_dump($app->file->path('routes/web.php'));
+// var_dump($app);
+
+// $firstname = "Peter";
+// $lastname = "Griffin";
+// $age = "41";
+
+// $result = compact("firstname", "lastname", "age");
+
+// var_dump($result);
+// $obj = \Matariya\Database\MySqlConnection::class;
+// echo $obj;
+
 // $app = new Application($basePath);
 // $route = new Route(new Request);
 // $connect = new MySqlConnection();

@@ -11,25 +11,32 @@ class Route
      *
      * @var array
      */
-    public $routes = [];
+    private $routes = [];
+
+    private $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+        $this->request->prepareUrl();
+    }
 
     /**
      * adding routes to routes container
      *
      * @param  string $method
-     * @param  string $uri
+     * @param  string $url
      * @param  mixed $action
      * @return void
      */
-    public function addRoute(string $requestMethod = 'GET', string $uri, callable|string|array $action)
+    private function addRoute(string $requestMethod = 'GET', string $url, callable|string|array $action)
     {
-        $uri = trim($uri, '/');
-
         $this->routes[] = [
-            'uri' => $uri,
-            'method' => $requestMethod,
-            'action' => $action,
-        ];
+            'url'     => $url,
+            'pattern' => $this->generatePattern($url),
+            'method'  => $requestMethod,
+            'action'  => $action,
+        ]; 
     }
 
 
@@ -43,7 +50,6 @@ class Route
     public function get($url, $action)
     {
         $this->addRoute('GET', $url, $action);
-        return $this;
     }
 
     /**
@@ -56,7 +62,6 @@ class Route
     public function post($url, $action)
     {
         $this->addRoute('post', $url, $action);
-        return $this;
     }
 
     public function delete()
@@ -70,18 +75,68 @@ class Route
     }
 
     /**
-     * execute routes actions
+     * Get Proper Route
      *
-     * @return void
+     * @return array
      */
-    public function handleRoute()
+    public function getProperRoute()
     {
-        if (ltrim($this->request->getUrl(), '/') == $this->routes[0]['uri']) {
-            $action = $this->routes[0]['action'] ?? false;
-            if (is_callable($action)) {
-                return call_user_func_array($action, []);
+        foreach ($this->routes as $route) {
+            if ($this->isMatching($route['pattern'])) {
+
+                $arguments = $this->getArgumentsFrom($route['pattern']);
+
+                // [Controller::class, 'method']
+                list($controller, $method) = $route['action'];
             }
         }
+        return [$controller, $method, $arguments];
+    }
+
+
+    /**
+     * Determine if the given pattern matches the current request url
+     *
+     * @param string $pattern
+     * @return bool
+     */
+    private function isMatching($pattern)
+    {
+        return preg_match($pattern, $this->request->getUrl());
+    }
+    
+    /**
+     * generate regular expression pattern to extract parameters from requested url
+     *
+     * @param  mixed $url
+     * @return string
+     */
+    private function generatePattern($url)
+    {
+        $pattern = '#^';
+
+        $pattern .= str_replace([':text', ':id'], ['([a-zA-Z0-9-]+)', '(\d+)'] , $url);
+
+        $pattern .= '$#';
+
+        return $pattern;
+    }
+
+
+    /**
+     * Get Arguments from the current request url
+     * based on the given pattern
+     *
+     * @param string $pattern
+     * @return array
+     */
+    private function getArgumentsFrom($pattern)
+    {
+        preg_match($pattern, $this->request->getUrl(), $matches);
+
+        array_shift($matches);
+
+        return $matches;
     }
 
 }

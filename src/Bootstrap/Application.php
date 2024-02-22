@@ -2,7 +2,6 @@
 
 namespace Matariya\Bootstrap;
 
-use Matariya\File\File;
 use ReflectionClass;
 
 class Application
@@ -21,8 +20,6 @@ class Application
      */
     private $bindings = [];
 
-
-
     /**
      * Application Object
      *
@@ -30,9 +27,36 @@ class Application
      */
     private static $instance;
 
-    public function __construct($basePath)
+    private function __construct($basePath)
     {
-        new File($this->basePath = $basePath);
+        $this->file->setBasePath($basePath);
+    }
+    
+    /**
+     * get application instance
+     *
+     * @param  mixed $basePath
+     * @return \Matariya\Bootstrap\Application
+     */
+    public static function getInstance($basePath = null)
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static($basePath);
+        }
+
+        return static::$instance;
+    }
+    
+    /**
+     * run core of the application
+     *
+     * @return void
+     */
+    public function run()
+    {
+        $this->session->start();
+        $this->file->requireFile('routes/web.php');
+        list($controller, $method, $arguments) = $this->route->getProperRoute();
     }
 
     /**
@@ -42,7 +66,7 @@ class Application
      * @param mixed $value
      * @return mixed
      */
-    public function bind($abstract, $concrete)
+    private function bind($abstract, $concrete)
     {
         $this->bindings[$abstract] = $concrete;
     }
@@ -55,7 +79,7 @@ class Application
      */
     public function get($abstract)
     {
-        if (! $this->isSharing($abstract)) {
+        if (!$this->isSharing($abstract)) {
             if ($this->isCoreAlias($abstract)) {
                 $this->bind($abstract, $this->build($abstract));
             } else {
@@ -75,26 +99,26 @@ class Application
     private function build($abstract)
     {
         $coreClasses = $this->coreClasses();
-
-        $concrete = $coreClasses[$abstract];
+        
+        $concrete = class_exists($abstract) ? $abstract : $coreClasses[$abstract];
 
         $reflector = new ReflectionClass($concrete);
 
-        if (! $reflector->isInstantiable()) {
-			throw new \Exception("Class {$concrete} is not instantiable");
-		}
+        if (!$reflector->isInstantiable()) {
+            throw new \Exception("Class {$concrete} is not instantiable");
+        }
 
-		if (! $constructor = $reflector->getConstructor()) {
-			// get new instance from class
-			return $reflector->newInstance();
-		}
+        if (!$constructor = $reflector->getConstructor()) {
+            // get new instance from class
+            return $reflector->newInstance();
+        }
 
         //dependencies container
         $dependencies = [];
 
         foreach ($constructor->getParameters() as $parameter) {
-            
-            if (! $parameter->getType() || ! class_exists($dependency = $parameter->getType()?->getName())) {
+
+            if (!$parameter->getType() || !class_exists($dependency = $parameter->getType()?->getName())) {
                 $message = "No binding was registered on {$concrete} for constructor parameter, \${$parameter->getName()}.";
 
                 throw new \Exception($message);
@@ -105,7 +129,6 @@ class Application
 
         return $reflector->newInstanceArgs($dependencies);
     }
-    
 
 
     /**
@@ -152,15 +175,15 @@ class Application
     private function coreClasses()
     {
         return [
-            'request' => \Matariya\Http\Request::class,
-            'response' => \Matariya\Http\Response::class,
-            'route' => \Matariya\Router\Route::class,
-            'db' => \Matariya\Database\MySqlQueryBuilder::class,
+            'request'       => \Matariya\Http\Request::class,
+            'response'      => \Matariya\Http\Response::class,
+            'route'         => \Matariya\Router\Route::class,
+            'db'            => \Matariya\Database\MySqlQueryBuilder::class,
             'db.connection' => \Matariya\Database\MySqlConnection::class,
-            'file' => \Matariya\File\File::class,
-            'session' => \Matariya\Session\Session::class,
-            'url' => \Matariya\Http\Url::class,
-            'validator' => \Matariya\Validation\Validation::class,
+            'file'          => \Matariya\File\File::class,
+            'session'       => \Matariya\Session\Session::class,
+            'url'           => \Matariya\Http\Url::class,
+            'validator'     => \Matariya\Validation\Validation::class,
         ];
     }
 }

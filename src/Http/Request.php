@@ -31,7 +31,7 @@ class Request
         if (str_contains($requestUri, '?')) {
             list($requestUri, $queryString) = explode('?', $requestUri);
         }
-        $this->url = explode('public', $requestUri)[1];
+        $this->url = trim(preg_replace('#^'.$script.'#', '' , $requestUri), '/');
         $this->baseUrl = static::server('REQUEST_SCHEME') . '://' . $this->server('HTTP_HOST') . $script . '/';
     }
 
