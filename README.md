@@ -42,11 +42,6 @@ To install the framework, follow these steps:
     git clone https://github.com/yourusername/your-repo-name.git
     ```
 
-2. Navigate to the project directory:
-
-    ```sh
-    cd your-repo-name
-    ```
 
 3. Install the dependencies using Composer:
 
@@ -64,3 +59,22 @@ Define your application routes in the `routes/web.php` file:
 ```php
 $router->get('/', 'HomeController@index');
 $router->post('/submit', 'FormController@submit');
+
+
+### Controller
+
+Define your application Controllers in the `App/Http` Directory:
+
+```php
+namespace App\Controllers;
+
+use App\Src\Controller;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        return $this->view('home');
+    }
+}
+
