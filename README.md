@@ -8,10 +8,7 @@ A simple PHP MVC framework for building web applications. This framework follows
 - [Features](#features)
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Folder Structure](#folder-structure)
-- [Methodologies](#methodologies)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Introduction
 
