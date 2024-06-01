@@ -54,7 +54,7 @@ To install the framework, follow these steps:
 Define your application routes in the `routes/web.php` file:
 
 ```php
-$router->get('/', 'HomeController@index');
+$router->get('/', [HomeController::class, 'index']);
 $router->post('/submit', 'FormController@submit');
 ```
 
